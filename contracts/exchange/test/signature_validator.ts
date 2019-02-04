@@ -11,7 +11,7 @@ import {
     web3Wrapper,
 } from '@0x/contracts-test-utils';
 import { BlockchainLifecycle } from '@0x/dev-utils';
-import { assetDataUtils, orderHashUtils, signatureUtils } from '@0x/order-utils';
+import { assetDataUtils, orderHashUtils, signatureUtils  } from '@0x/order-utils';
 import { RevertReason, SignatureType, SignedOrder } from '@0x/types';
 import * as chai from 'chai';
 import { LogWithDecodedArgs } from 'ethereum-types';
@@ -31,7 +31,7 @@ const expect = chai.expect;
 
 const blockchainLifecycle = new BlockchainLifecycle(web3Wrapper);
 // tslint:disable:no-unnecessary-type-assertion
-describe('MixinSignatureValidator', () => {
+describe.only('MixinSignatureValidator', () => {
     let signedOrder: SignedOrder;
     let orderFactory: OrderFactory;
     let signatureValidator: TestSignatureValidatorContract;
@@ -520,6 +520,15 @@ describe('MixinSignatureValidator', () => {
             expect(logArgs.signerAddress).to.equal(signerAddress);
             expect(logArgs.validatorAddress).to.equal(testValidator.address);
             expect(logArgs.approved).to.equal(approval);
+        });
+    });
+
+    describe.only('preSigned', () => {
+        it('should return false if hash was not presigned', async () => {
+            const nonExistentOrderHashHex = '0x2ca5224993ec001fddc77d441947abb55133c91fa46589f5cd6e56c980fa5e45';
+            const nonExistentSignerAddress = addressUtils.generatePseudoRandomAddress();
+            const isPreSigned = await signatureValidator.preSigned.callAsync(nonExistentOrderHashHex, nonExistentSignerAddress);
+            expect(isPreSigned).to.be.false();
         });
     });
 });
